@@ -3,7 +3,7 @@ import {
   Get,
   Body,
   Query,
-  Put,
+  Post,
 } from '@nestjs/common';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
 import { TemplateService } from './template.service';
@@ -23,12 +23,12 @@ export class TemplateController {
     return this.templateService.findOne(query);
   }
 
-  @Put('update')
+  @Post('update')
   @Transaction()
   updateOne(
-    @Body() uUser,
+    @Body() template,
     @TransactionManager() manager: EntityManager,
   ): Promise<ResponseUtil> {
-    return this.templateService.updateOne(uUser, manager);
+    return this.templateService.updateOne(template, manager);
   }
 }
