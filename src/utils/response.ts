@@ -1,7 +1,7 @@
-class ResponseUtil {
-    success = false;
-    message = ''
-    data = {}
+export class ResponseUtil<D = any> {
+    success: boolean = false;
+    message: string = ''
+    data: D | any = {}
 
     // constructor(success: boolean, message: string, data: {}) {
     //     this.success = success
@@ -9,19 +9,17 @@ class ResponseUtil {
     //     this.data = data
     // }
 
-    ok(data: {}, message?: string) {
+    ok(data: D | any, message?: string) {
         this.success = true
         this.data = data
         this.message = message || '操作成功';
         return this
     }
 
-    fail(data?: any, message?: string) {
-        this.success = false 
+    fail(data?: D | any, message?: string) {
+        this.success = false
         this.data = data || null
         this.message = message || '操作失败';
         return this
     }
 }
-
-module.exports = ResponseUtil;

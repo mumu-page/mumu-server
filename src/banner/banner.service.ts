@@ -1,42 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { getRepository } from 'typeorm';
-
 import { Project } from '../entities/project.entity';
 import { Component } from '../entities/component.entity';
 import { Plugin } from '../entities/plugin.entity';
+import { Banner } from 'src/entities/banner.entity';
+import { ResponseUtil } from 'src/utils/response';
 
-/* 
-  使用Repository<>对象执行增删查改的操作
-*/
 @Injectable()
 export class BannerService {
-  /* 
-    获取所有用户数据列表
-  */
-  async findAll(): Promise<Project[]> {
-    // 构建QueryBuilder查询
-    /* 
-      1.Question、Category,QuestionCategory 指的是实体类的名称
-      2.innerJoin()是对关联表进行关联，quescate，question，category都是别名 
-      ------ 三个参数含义分别是：实体对象，别名，关联关系
-      3.innerJoinAndMapMany()中的question.list是为了给question增加一个list字段用于保存Category的所有内容
-      ------ 四个参数含义分别是：展示列表名,实体对象，别名，关联关系
-    */
-    const list = await getRepository(Project)
-      .createQueryBuilder('question')
-      .innerJoin(Plugin, 'quescate', 'question.id = quescate.questionId')
-      .innerJoinAndMapMany(
-        'question.list',
-        Component,
-        'category',
-        'category.id = quescate.categoryId',
-      )
-      .getMany();
-    return list;
-    /*
-      另一种使用getManager().query("sql语句")执行原生sql操作即可。
-      补充：联表查询建议使用QueryBuilder自由构建出所需要的查询内容
-    */
+  async findAll(): Promise<ResponseUtil> {
+    const data = await getRepository(Banner).find()
+    return new ResponseUtil().ok(data)
+  }
+  async create(body, manager): Promise<ResponseUtil> {
+    const data = await manager.save(Banner, body)
+    return new ResponseUtil().ok(data)
   }
   /* 
     获取单个用户详情

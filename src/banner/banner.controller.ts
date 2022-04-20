@@ -7,32 +7,23 @@ import {
   Query,
   Put,
 } from '@nestjs/common';
-
+import { ResponseUtil } from 'src/utils/response';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
-
 import { BannerService } from './banner.service';
 
-import { Project } from '../entities/project.entity';
-
-@Controller('user')
+@Controller('banner')
 export class BannerController {
-  constructor(private readonly userService: BannerService) {}
+  constructor(private readonly bannerService: BannerService) { }
 
-  /* 
-    查询所有列表 
-    @params 无
-  */
-  @Get('list')
-  findAll(): Promise<Project[]> {
-    return this.userService.findAll();
+  @Get('query')
+  query(): Promise<ResponseUtil> {
+    return this.bannerService.findAll();
   }
-  /* 
-    查询单个详情
-    @Query ?id=xxx
-   */
-  @Get('detail')
-  findOne(@Query() query): Promise<Project> {
-    return this.userService.findOne(query);
+
+  @Post('create')
+  @Transaction()
+  create(@Body() body, @TransactionManager() manager: EntityManager,): Promise<ResponseUtil> {
+    return this.bannerService.create(body, manager);
   }
   /* 
     新增账号和用户信息数据
@@ -53,7 +44,7 @@ export class BannerController {
     @Body() rUser,
     @TransactionManager() manager: EntityManager,
   ): Promise<string> {
-    return this.userService.addOne(rUser, manager);
+    return this.bannerService.addOne(rUser, manager);
   }
   /* 
     修改账号和用户信息数据
@@ -72,7 +63,7 @@ export class BannerController {
     @Body() uUser,
     @TransactionManager() manager: EntityManager,
   ): Promise<string> {
-    return this.userService.updateOne(uUser, manager);
+    return this.bannerService.updateOne(uUser, manager);
   }
   /* 
     删除数据
@@ -85,6 +76,6 @@ export class BannerController {
     @Query() query,
     @TransactionManager() manager: EntityManager,
   ): Promise<string> {
-    return this.userService.delOne(query, manager);
+    return this.bannerService.delOne(query, manager);
   }
 }

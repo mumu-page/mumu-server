@@ -1,5 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BannerModule } from './banner/banner.module';
+import { ComponentModule } from './component/component.module';
+import { PluginModule } from './plugin/plugin.module';
+import { ProjectModule } from './project/project.module';
+import { ReleaseModule } from './release/release.module';
+import { TemplateModule } from './template/template.module';
 
 // 子模块加载
 import { UserModule } from './user/user.module';
@@ -20,6 +26,12 @@ import { UserModule } from './user/user.module';
     }),
     // 加载子模块
     UserModule,
+    BannerModule,
+    ComponentModule,
+    PluginModule,
+    ProjectModule,
+    ReleaseModule,
+    TemplateModule,
   ],
 })
 export class AppModule {}
