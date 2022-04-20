@@ -1,17 +1,11 @@
-import {
-  Controller,
-  Get,
-  Body,
-  Query,
-  Post,
-} from '@nestjs/common';
+import { Controller, Get, Body, Query, Post } from '@nestjs/common';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
 import { TemplateService } from './template.service';
 import { ResponseUtil } from 'src/utils/response';
 
 @Controller('template')
 export class TemplateController {
-  constructor(private readonly templateService: TemplateService) { }
+  constructor(private readonly templateService: TemplateService) {}
 
   @Get('list')
   findAll(): Promise<ResponseUtil> {
