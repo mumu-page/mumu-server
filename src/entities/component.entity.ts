@@ -17,7 +17,7 @@ export class Component extends BaseEntity {
   @Column({ type: 'varchar', name: 'gitUrl', comment: 'GIT地址' })
   gitUrl: string;
 
-  @Column({ type: 'varchar', name: 'config', comment: 'Config' })
+  @Column({ type: 'varchar', name: 'config', comment: 'Config', length: 99999 })
   config: string;
 
   @Column({ type: 'varchar', name: 'status', comment: '组件状态' })

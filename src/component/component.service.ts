@@ -5,7 +5,7 @@ import { ResponseUtil } from 'src/utils/response';
 
 const formatWhereCase = (params) => {
   const where = {};
-  Object.keys(params).forEach(key => {
+  Object.keys(params).forEach((key) => {
     if (params[key]) {
       where[key] = params[key];
     }
@@ -20,13 +20,13 @@ export class ComponentService {
       try {
         // todo 先查是否存在同名组件
         const data = await manager.save(Component, component);
-        return new ResponseUtil().ok(data)
+        return new ResponseUtil().ok(data);
       } catch (e) {
-        console.log(e)
-        return new ResponseUtil().fail()
+        console.log(e);
+        return new ResponseUtil().fail();
       }
     } else {
-      return new ResponseUtil().fail(null, 'gitUrl || name 必填')
+      return new ResponseUtil().fail(null, 'gitUrl || name 必填');
     }
   }
 
@@ -34,23 +34,23 @@ export class ComponentService {
     try {
       // todo 先查是否存在同名组件
       const data = await manager.update(Component, component);
-      return new ResponseUtil().ok(data)
+      return new ResponseUtil().ok(data);
     } catch (e) {
-      console.log(e)
-      return new ResponseUtil().fail()
+      console.log(e);
+      return new ResponseUtil().fail();
     }
   }
 
   async findAll(): Promise<ResponseUtil> {
-    const list = await getRepository(Component).find()
-    return new ResponseUtil().ok(list)
+    const list = await getRepository(Component).find();
+    return new ResponseUtil().ok(list);
   }
 
   async findOne(query): Promise<ResponseUtil> {
-    const { id, gitUrl } = query
+    const { id, gitUrl } = query;
     const list = await getRepository(Component).findOne(query.id, {
-      where: formatWhereCase({ id, gitUrl })
-    })
-    return new ResponseUtil().ok(list)
+      where: formatWhereCase({ id, gitUrl }),
+    });
+    return new ResponseUtil().ok(list);
   }
 }

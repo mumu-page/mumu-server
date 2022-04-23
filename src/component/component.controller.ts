@@ -1,23 +1,17 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
 import { ComponentService } from './component.service';
 import { ResponseUtil } from 'src/utils/response';
 
 @Controller('component')
 export class ComponentController {
-  constructor(private readonly componentService: ComponentService) { }
+  constructor(private readonly componentService: ComponentService) {}
 
   @Post('add')
   @Transaction()
   async addComponent(
     @Body() body,
-    @TransactionManager() manager: EntityManager
+    @TransactionManager() manager: EntityManager,
   ): Promise<ResponseUtil> {
     return this.componentService.addComponent(body, manager);
   }
@@ -25,7 +19,7 @@ export class ComponentController {
   @Post('update')
   async updateComponent(
     @Body() body,
-    @TransactionManager() manager: EntityManager
+    @TransactionManager() manager: EntityManager,
   ): Promise<ResponseUtil> {
     return this.componentService.updateComponent(body, manager);
   }
