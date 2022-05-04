@@ -18,8 +18,9 @@ export class Project extends BaseEntity {
   name: string;
 
   @Column({
-    comment: '页面配置',
+    type: 'mediumtext',
     name: 'pageConfig',
+    comment: '页面配置',
   })
   pageConfig: string;
 

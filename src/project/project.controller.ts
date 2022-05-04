@@ -7,9 +7,9 @@ import { ResponseUtil } from 'src/utils/response';
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-  @Get('findAll')
-  findAll(@Query() query): Promise<ResponseUtil> {
-    return this.projectService.findAll(query);
+  @Get('find')
+  findOne(@Query() query): Promise<ResponseUtil> {
+    return this.projectService.find(query);
   }
 
   @Post('createProject')
@@ -23,7 +23,7 @@ export class ProjectController {
 
   @Get('preview')
   preview(@Query() query): Promise<ResponseUtil> {
-    return this.projectService.findOne(query);
+    return this.projectService.find(query);
   }
 
   @Post('updateConfig')

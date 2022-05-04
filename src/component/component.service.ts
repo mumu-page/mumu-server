@@ -43,6 +43,17 @@ export class ComponentService {
 
   async findAll(): Promise<ResponseUtil> {
     const list = await getRepository(Component).find();
+    if (Array.isArray(list)) {
+      list.forEach((item) => {
+        try {
+          if(item.config) {
+            item.config = JSON.parse(item.config);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    }
     return new ResponseUtil().ok(list);
   }
 

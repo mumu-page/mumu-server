@@ -1,0 +1,12 @@
+default: # 默认连接
+  type: "mysql"
+  host: "152.32.211.215"
+  port: 3306
+  username: "mumu"
+  password: "W3LWJXyMEKCNzHTy"
+  database: "mumu"
+  entities: [
+    "dist/entities/**/*.js"
+  ]
+  synchronize: true # 定义数据库表结构与实体类字段同步
+  timezone: '+08:00' # 东八区

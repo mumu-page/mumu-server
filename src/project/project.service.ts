@@ -7,9 +7,13 @@ import * as download from 'download-git-repo';
 import * as fs from 'fs';
 import * as process from 'child_process';
 import utils from 'src/utils/fileUtils';
+
 const octokit = new Octokit({
-  auth: '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',
+  auth: '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',
 });
+
+const TPL_DIR = 'tpl';
+const BUILD_DIR = 'build';
 
 function downloadFunc(downloadRepoUrl, temp_dest) {
   console.log('开始下载模版...');
@@ -30,7 +34,7 @@ async function release(repoUrl, repoName) {
   try {
     process.execSync(
       [
-        `cd static/${repoName}/dist`,
+        `cd ${TPL_DIR}/${repoName}/${BUILD_DIR}`,
         `git init`,
         `git remote add origin ${repoUrl}`,
         `git add -A`,
@@ -46,7 +50,7 @@ async function release(repoUrl, repoName) {
   } finally {
     process.exec(
       [
-        `cd static`,
+        `cd ${TPL_DIR}`,
         `rm -rf ${repoName}`, // linux
         // `rd /s /q ${repoName} ` // window
       ].join(' && '),
@@ -59,19 +63,21 @@ async function release(repoUrl, repoName) {
   }
 }
 
-async function renderTpl({
-  templateGit,
-  name: repoName,
-  data,
-  repoUrl,
-  templateConfig,
-}) {
-  if (!(await utils.existOrNot('./static'))) {
-    await utils.mkdirFolder('static');
+async function renderTpl(
+  {
+    // templateGit,
+    name: repoName,
+    data,
+    repoUrl,
+    templateConfig,
+  },
+) {
+  if (!(await utils.existOrNot(`./${TPL_DIR}`))) {
+    await utils.mkdirFolder(TPL_DIR);
   }
 
   // 基础模版所在目录，如果是初始化，则是模板名称，否则是项目名称
-  const temp_dest = `static/${templateConfig.templateName || repoName}`;
+  const temp_dest = `${TPL_DIR}/${templateConfig.templateName || repoName}`;
 
   // 下载模板
   if (!(await utils.existOrNot(temp_dest))) {
@@ -79,7 +85,7 @@ async function renderTpl({
   }
 
   // 注入数据
-  const res = fs.readFileSync(`${temp_dest}/dist/index.html`, 'utf-8');
+  const res = fs.readFileSync(`${temp_dest}/${BUILD_DIR}/index.html`, 'utf-8');
   let target = res.replace(
     /(?<=<script data-inject>)(.|\n)*?(?=<\/script>)/,
     `window.__mumu_config__= ${JSON.stringify({
@@ -108,7 +114,7 @@ async function renderTpl({
     );
   }
 
-  fs.writeFileSync(`${temp_dest}/dist/index.html`, target);
+  fs.writeFileSync(`${temp_dest}/${BUILD_DIR}/index.html`, target);
 
   await release(repoUrl, templateConfig.templateName || repoName);
 
@@ -155,13 +161,19 @@ async function createProject(config) {
 
 @Injectable()
 export class ProjectService {
-  async findAll(query): Promise<ResponseUtil> {
+  async find(query): Promise<ResponseUtil> {
     const list = await getRepository(Project).find({ where: query });
     list.forEach((project) => {
       try {
-        project.pageConfig = JSON.parse(project.pageConfig);
-        project.gitConfig = JSON.parse(project.gitConfig);
-        project.releaseInfo = JSON.parse(project.releaseInfo);
+        if (project.pageConfig) {
+          project.pageConfig = JSON.parse(project.pageConfig);
+        }
+        if (project.gitConfig) {
+          project.gitConfig = JSON.parse(project.gitConfig);
+        }
+        if (project.releaseInfo) {
+          project.releaseInfo = JSON.parse(project.releaseInfo);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -197,33 +209,36 @@ export class ProjectService {
     });
     return new ResponseUtil().ok(project);
   }
-  /* 
-    获取单个用户详情
-  */
-  async findOne(query): Promise<ResponseUtil> {
-    const list = await getRepository(Project).find({ where: { id: query.id } });
-    return new ResponseUtil().ok(list);
-  }
-  async updateConfig(body, manager): Promise<ResponseUtil> {
-    const list = await getRepository(Project).update(body, { id: body.id });
-    return new ResponseUtil().ok(list);
-  }
-  async release(body, manager): Promise<ResponseUtil> {
-    const { id } = body;
-    const projects = await getRepository(Project).findOne(id, {
-      where: { id },
+
+  async updateConfig(body, manager: EntityManager): Promise<ResponseUtil> {
+    const pageConfig = JSON.stringify(body.pageConfig);
+    await manager.update(Project, { id: body.id }, { pageConfig });
+    const result = await manager.findOne(Project, {
+      where: {
+        id: body.id,
+      },
     });
-    const { pageConfig } = (projects && projects[0]) || {};
+    return new ResponseUtil().ok(result);
+  }
+
+  async release(body, manager: EntityManager): Promise<ResponseUtil> {
+    const { id } = body;
+    const project = await manager.findOne(Project, id, {
+      where: { id },
+    })
+    const { pageConfig } = (project || {});
+    if (!pageConfig) return new ResponseUtil().fail(null, '发布失败: pageConfig 为空');
+    const _pageConfig = JSON.parse(pageConfig);
     const {
       gitName: name,
       templateName,
       templateGit,
-    } = (pageConfig && pageConfig.config) || {};
+    } = _pageConfig?.config || {};
 
     const config = {
-      ...pageConfig.config,
+      ..._pageConfig.config,
       name,
-      data: pageConfig,
+      data: _pageConfig,
       templateConfig: {
         templateName,
         git: templateGit,
@@ -236,6 +251,6 @@ export class ProjectService {
       ...config,
       repoUrl: data.ssh_url,
     });
-    return new ResponseUtil().fail(data, `https://mumu-page.github.io/${name}`);
+    return new ResponseUtil().fail(`https://mumu-page.github.io/${name}`, '发布成功');
   }
 }
