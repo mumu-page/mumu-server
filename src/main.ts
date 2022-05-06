@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // createConnection方法会自动读取来自ormconfig文件或环境变量中的连接选项
   await createConnection();
-  app.enableCors({ origin: 'http://localhost:3000', credentials: true });
+  app.enableCors({ origin: ['http://localhost:3000', 'https://mumu-page.github.io/'], credentials: true });
   // swagger配置
   const options = new DocumentBuilder()
     // .setTitle('')

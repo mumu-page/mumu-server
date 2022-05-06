@@ -9,6 +9,7 @@ import { TemplateModule } from './template/template.module';
 
 // 子模块加载
 import { UserModule } from './user/user.module';
+import { BingModule } from './bing/bing.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { UserModule } from './user/user.module';
     ProjectModule,
     ReleaseModule,
     TemplateModule,
+    BingModule
   ],
 })
 export class AppModule {}
